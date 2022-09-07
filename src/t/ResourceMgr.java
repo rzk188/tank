@@ -1,10 +1,17 @@
 package t;
 
+import singleton.Mgr01;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class ResourceMgr {
+    private static final ResourceMgr INSTANCE=new ResourceMgr();
+    private ResourceMgr(){};
+    public static ResourceMgr getInstance(){
+        return INSTANCE;
+    }
     public static BufferedImage goodtankl,goodtankr,goodtanku,goodtankd;
     public static BufferedImage badtankl,badtankr,badtanku,badtankd;
     public static BufferedImage bulletl,bulletr,bulletd,bulletu;
