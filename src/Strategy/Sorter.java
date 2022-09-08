@@ -2,18 +2,18 @@ package Strategy;
 
 import java.util.Objects;
 
-public class Sorter {
-    public static void sort(Comparable[] arr) {
+public class Sorter<T> {
+    public  void sort(T[] arr,Comparator<T> comparator) {
         for (int i = 0; i < arr.length-1; i++) {
             int minPos=i;
             for (int j = i+1; j < arr.length; j++) {
-                minPos=arr[j].compareTo(arr[minPos])==-1?j:minPos;
+                minPos= comparator.compare(arr[j],arr[minPos])==-1?j:minPos;
             }
             swap(arr,i,minPos);
         }
     }
-    static void swap(Comparable[]arr,int i, int j){
-        Comparable temp=arr[i];
+    void swap(T[] arr,int i, int j){
+        T temp=arr[i];
         arr[i]=arr[j];
         arr[j]=temp;
     }
