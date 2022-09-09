@@ -1,6 +1,7 @@
 package t;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
 
@@ -37,17 +38,30 @@ public class tank {
     FireStrategy fs=new FourDirFireStrategy();
     public tank(int x, int y ,dir dir1,tankframe tf,Group group) {
         super();
-        this.x=x;
-        this.y=y;
-        this.dir1=dir1;
-        this.tf=tf;
-        this.group=group;
-        rect.x=this.x;
-        rect.y=this.y;
-        rect.width=WIDTH;
-        rect.height=HEIGHT;
-        if(group==Group.GOOD)fs=new FourDirFireStrategy();
-        else fs=new DefaultFireStrategy();
+        this.x = x;
+        this.y = y;
+        this.dir1 = dir1;
+        this.tf = tf;
+        this.group = group;
+        rect.x = this.x;
+        rect.y = this.y;
+        rect.width = WIDTH;
+        rect.height = HEIGHT;
+        if (group == Group.GOOD) {
+            String goodFSName=(String)PropertyMgr.get("goodFs");
+            try {
+                fs=(FireStrategy) Class.forName(goodFSName).getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            String badFSName = (String) PropertyMgr.get(("badFs"));
+            try {
+                fs = (FireStrategy) Class.forName(badFSName).getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void paint(Graphics g) {
