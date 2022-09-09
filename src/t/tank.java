@@ -6,10 +6,10 @@ import java.util.Random;
 
 public class tank {
     public Rectangle rect=new Rectangle();
-    private int x, y;
+    int x, y;
     private Random random=new Random();
     private boolean living=true;
-    private Group group=Group.BAD;
+    Group group=Group.BAD;
     public int getX() {
         return x;
     }
@@ -22,7 +22,7 @@ public class tank {
     public void setY(int y) {
         this.y = y;
     }
-    private tankframe tf=null;
+    tankframe tf=null;
     private boolean moving=true;
     public dir getDir1() {
         return dir1;
@@ -30,10 +30,11 @@ public class tank {
     public void setDir1(dir dir1) {
         this.dir1 = dir1;
     }
-    private dir dir1 = dir.DOWN;
+    dir dir1 = dir.DOWN;
     private static final int SPEED = 5;
     public static int WIDTH= ResourceMgr.goodtankl.getWidth();
     public static int HEIGHT= ResourceMgr.goodtankl.getHeight();
+    FireStrategy fs=new FourDirFireStrategy();
     public tank(int x, int y ,dir dir1,tankframe tf,Group group) {
         super();
         this.x=x;
@@ -45,6 +46,8 @@ public class tank {
         rect.y=this.y;
         rect.width=WIDTH;
         rect.height=HEIGHT;
+        if(group==Group.GOOD)fs=new FourDirFireStrategy();
+        else fs=new DefaultFireStrategy();
     }
 
     public void paint(Graphics g) {
@@ -113,10 +116,7 @@ public class tank {
 
 
     public void fire() {
-        int bx=this.x+tank.WIDTH/2-bullet.WIDTH/2;
-        int by=this.y+tank.HEIGHT/2-bullet.HEIGHT/2;
-        tf.bullets.add(new bullet(bx,by,this.dir1,this.tf,this.group));
-
+        fs.fire(this);
     }
 
     public void die() {
