@@ -1,14 +1,11 @@
 package t;
 
-import t.abstractfactory.BaseTank;
-
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
 
-public class tank extends BaseTank{
-    //public Rectangle rect=new Rectangle();
+public class tank {
+    public Rectangle rect=new Rectangle();
     int x, y;
     private Random random=new Random();
     private boolean living=true;
@@ -25,7 +22,6 @@ public class tank extends BaseTank{
     public void setY(int y) {
         this.y = y;
     }
-    tankframe tf=null;
     private boolean moving=true;
     public dir getDir1() {
         return dir1;
@@ -38,12 +34,13 @@ public class tank extends BaseTank{
     public static int WIDTH= ResourceMgr.goodtankl.getWidth();
     public static int HEIGHT= ResourceMgr.goodtankl.getHeight();
     FireStrategy fs=new FourDirFireStrategy();
-    public tank(int x, int y ,dir dir1,tankframe tf,Group group) {
+    GameModel gm;
+    public tank(int x, int y ,dir dir1,GameModel gm,Group group) {
         super();
         this.x = x;
         this.y = y;
         this.dir1 = dir1;
-        this.tf = tf;
+        this.gm = gm;
         this.group = group;
         rect.x = this.x;
         rect.y = this.y;
@@ -52,16 +49,24 @@ public class tank extends BaseTank{
         if (group == Group.GOOD) {
             String goodFSName=(String)PropertyMgr.get("goodFs");
             try {
-                fs=(FireStrategy) Class.forName(goodFSName).getDeclaredConstructor().newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
+                fs=(FireStrategy) Class.forName(goodFSName).newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
         } else {
-            String badFSName = (String) PropertyMgr.get(("badFs"));
+            String badFSName=(String)PropertyMgr.get(("badFs"));
             try {
-                fs = (FireStrategy) Class.forName(badFSName).getDeclaredConstructor().newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
+                fs=(FireStrategy) Class.forName(badFSName).newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -71,7 +76,7 @@ public class tank extends BaseTank{
         //x+=10;
         //y+=10;
         if(!living){
-            tf.tanks.remove(this);
+            gm.tanks.remove(this);
         }
 
         switch (dir1) {

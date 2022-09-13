@@ -1,37 +1,34 @@
 package t;
 
-import t.abstractfactory.BaseBullet;
-import t.abstractfactory.BaseTank;
-
 import java.awt.*;
 
 
-public class bullet extends BaseBullet{
+public class bullet {
     private static final int SPEED=10;
     private int x,y;
     private dir dir1;
     public static int WIDTH= ResourceMgr.bulletd.getWidth();
     public static int HEIGHT= ResourceMgr.bulletd.getHeight();
     private boolean living =true;
-    tankframe tf=null;
+    GameModel gm=null;
     private Group group=Group.BAD;
     Rectangle rect=new Rectangle();
 
-    public bullet(int x, int y, dir dir1,tankframe tf,Group group) {
+    public bullet(int x, int y, dir dir1,GameModel gm,Group group) {
         this.x = x;
         this.y = y;
         this.dir1 = dir1;
-        this.tf=tf;
+        this.gm=gm;
         this.group=group;
         rect.x=this.x;
         rect.y=this.y;
         rect.width=WIDTH;
         rect.height=HEIGHT;
-        tf.bullets.add(this);
+        gm.bullets.add(this);
     }
     public void paint(Graphics g){
         if(!living){
-            tf.bullets.remove(this);
+            gm.bullets.remove(this);
         }
         switch (dir1) {
             case LEFT:
@@ -62,16 +59,16 @@ public class bullet extends BaseBullet{
         rect.y=this.y;
     }
 
-    public void collidewith(BaseTank tank1) {
-        if(this.group==tank1.getGroup()) return;
+    public void collidewith(tank tank) {
+        if(this.group==tank.getGroup()) return;
         //Rectangle rect1=new Rectangle(this.x,this.y,WIDTH,HEIGHT);
         //Rectangle rect2=new Rectangle(tank.getX(),tank.getY(),tank.WIDTH,tank.HEIGHT);
-        if (rect.intersects(tank1.rect)){
-            tank1.die();
+        if (rect.intersects(tank.rect)){
+            tank.die();
             this.die();
-            int ex=tank1.getX()+tank.WIDTH/2-Explode.WIDTH/2;
-            int ey=tank1.getY()+tank.HEIGHT/2-Explode.HEIGHT/2;
-            tf.e.add(tf.gf.createExplode(ex,ey,this.tf));
+            int ex=tank.getX()+tank.WIDTH/2-Explode.WIDTH/2;
+            int ey=tank.getY()+tank.HEIGHT/2-Explode.HEIGHT/2;
+            gm.e.add(new Explode(ex,ey,this.gm));
         }
 
     }
