@@ -3,7 +3,7 @@ package t;
 import java.awt.*;
 
 
-public class Explode {
+public class Explode extends GameObject{
 
     private int x,y;
     public static int WIDTH= ResourceMgr.explodes[0].getWidth();
@@ -17,9 +17,13 @@ public class Explode {
         this.gm = gm;
     }
     public void paint(Graphics g){
+        /*Color c = g.getColor();
+        g.setColor(Color.white);
+        g.drawString("爆炸的数量：" + gm.size(), 10, 100);
+        g.setColor(c);*/
         g.drawImage(ResourceMgr.explodes[step++],x,y,null);
         if(step>=ResourceMgr.explodes.length) {
-            gm.e.remove(this);
+            gm.remove(this);
         }
     }
 }

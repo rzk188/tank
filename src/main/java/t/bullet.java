@@ -3,16 +3,16 @@ package t;
 import java.awt.*;
 
 
-public class bullet {
+public class bullet extends GameObject{
     private static final int SPEED=10;
     private int x,y;
     private dir dir1;
     public static int WIDTH= ResourceMgr.bulletd.getWidth();
     public static int HEIGHT= ResourceMgr.bulletd.getHeight();
     private boolean living =true;
-    GameModel gm=null;
+    public GameModel gm=null;
     private Group group=Group.BAD;
-    Rectangle rect=new Rectangle();
+    public Rectangle rect=new Rectangle();
 
     public bullet(int x, int y, dir dir1,GameModel gm,Group group) {
         this.x = x;
@@ -24,11 +24,15 @@ public class bullet {
         rect.y=this.y;
         rect.width=WIDTH;
         rect.height=HEIGHT;
-        gm.bullets.add(this);
+        gm.add(this);
     }
     public void paint(Graphics g){
+        /*Color c = g.getColor();
+        g.setColor(Color.white);
+        g.drawString("子弹的数量：" + gm.size(), 10, 60);
+        g.setColor(c);*/
         if(!living){
-            gm.bullets.remove(this);
+            gm.remove(this);
         }
         switch (dir1) {
             case LEFT:
@@ -59,8 +63,8 @@ public class bullet {
         rect.y=this.y;
     }
 
-    public void collidewith(tank tank) {
-        if(this.group==tank.getGroup()) return;
+    /*public boolean collidewith(tank tank) {
+        if(this.group==tank.getGroup()) return false;
         //Rectangle rect1=new Rectangle(this.x,this.y,WIDTH,HEIGHT);
         //Rectangle rect2=new Rectangle(tank.getX(),tank.getY(),tank.WIDTH,tank.HEIGHT);
         if (rect.intersects(tank.rect)){
@@ -68,12 +72,14 @@ public class bullet {
             this.die();
             int ex=tank.getX()+tank.WIDTH/2-Explode.WIDTH/2;
             int ey=tank.getY()+tank.HEIGHT/2-Explode.HEIGHT/2;
-            gm.e.add(new Explode(ex,ey,this.gm));
+            gm.add(new Explode(ex,ey,this.gm));
+            return true;
         }
+        return false;
 
-    }
+    }*/
 
-    private void die() {
+    public void die() {
         this.living =false;
     }
 

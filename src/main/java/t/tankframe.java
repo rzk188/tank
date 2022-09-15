@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class tankframe extends Frame {
-    GameModel gm=new GameModel();
-    static final int GAME_WIDTH=800;
+    public GameModel gm=new GameModel();
+    static final int GAME_WIDTH=1000;
     static final int GAME_HEIGHT=600;
 
     public tankframe(){

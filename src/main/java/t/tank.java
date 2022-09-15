@@ -1,15 +1,18 @@
 package t;
 
+import t.Strategy.FireStrategy;
+import t.Strategy.FourDirFireStrategy;
+
 import java.awt.*;
 import java.util.Random;
 
 
-public class tank {
+public class tank extends GameObject{
     public Rectangle rect=new Rectangle();
-    int x, y;
+    public int x, y;
     private Random random=new Random();
     private boolean living=true;
-    Group group=Group.BAD;
+    public Group group=Group.BAD;
     public int getX() {
         return x;
     }
@@ -29,12 +32,14 @@ public class tank {
     public void setDir1(dir dir1) {
         this.dir1 = dir1;
     }
-    dir dir1 = dir.DOWN;
+    public dir dir1 = dir.DOWN;
+    public int prex;
+    public int prey;
     private static final int SPEED = 5;
     public static int WIDTH= ResourceMgr.goodtankl.getWidth();
     public static int HEIGHT= ResourceMgr.goodtankl.getHeight();
     FireStrategy fs=new FourDirFireStrategy();
-    GameModel gm;
+    public GameModel gm;
     public tank(int x, int y ,dir dir1,GameModel gm,Group group) {
         super();
         this.x = x;
@@ -70,13 +75,23 @@ public class tank {
             }
         }
     }
+    public Rectangle getRect() {
+        return rect;
+    }
 
+    public void setRect(Rectangle rect) {
+        this.rect = rect;
+    }
     public void paint(Graphics g) {
         //g.fillRect(x,y,50,50);
         //x+=10;
         //y+=10;
+        /*Color c = g.getColor();
+        g.setColor(Color.white);
+        g.drawString("敌人的数量：" + gm.size(), 10, 80);
+        g.setColor(c);*/
         if(!living){
-            gm.tanks.remove(this);
+            gm.remove(this);
         }
 
         switch (dir1) {
@@ -105,12 +120,22 @@ public class tank {
     }
 
     private void move() {
+        prex=x;
+        prey=y;
         if(!moving) return;
         switch (dir1){
-            case LEFT -> x-=SPEED;
-            case RIGHT -> x+=SPEED;
-            case UP -> y-=SPEED;
-            case DOWN -> y+=SPEED;
+            case LEFT -> {
+                x-=SPEED;
+            }
+            case RIGHT -> {
+                x+=SPEED;
+            }
+            case UP -> {
+                y-=SPEED;
+            }
+            case DOWN -> {
+                y+=SPEED;
+            }
 
         }
         if (this.group==Group.BAD && random.nextInt(10)>8) this.fire();
@@ -151,4 +176,5 @@ public class tank {
     public void setGroup(Group group) {
         this.group = group;
     }
+
 }
