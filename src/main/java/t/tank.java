@@ -9,7 +9,6 @@ import java.util.Random;
 
 public class tank extends GameObject{
     public Rectangle rect=new Rectangle();
-    public int x, y;
     private Random random=new Random();
     private boolean living=true;
     public Group group=Group.BAD;
@@ -39,13 +38,11 @@ public class tank extends GameObject{
     public static int WIDTH= ResourceMgr.goodtankl.getWidth();
     public static int HEIGHT= ResourceMgr.goodtankl.getHeight();
     FireStrategy fs=new FourDirFireStrategy();
-    public GameModel gm;
-    public tank(int x, int y ,dir dir1,GameModel gm,Group group) {
+    public tank(int x, int y ,dir dir1,Group group) {
         super();
         this.x = x;
         this.y = y;
         this.dir1 = dir1;
-        this.gm = gm;
         this.group = group;
         rect.x = this.x;
         rect.y = this.y;
@@ -55,25 +52,18 @@ public class tank extends GameObject{
             String goodFSName=(String)PropertyMgr.get("goodFs");
             try {
                 fs=(FireStrategy) Class.forName(goodFSName).newInstance();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         } else {
             String badFSName=(String)PropertyMgr.get(("badFs"));
             try {
                 fs=(FireStrategy) Class.forName(badFSName).newInstance();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
+        GameModel.getInstance().add(this);
     }
     public Rectangle getRect() {
         return rect;
@@ -91,7 +81,7 @@ public class tank extends GameObject{
         g.drawString("敌人的数量：" + gm.size(), 10, 80);
         g.setColor(c);*/
         if(!living){
-            gm.remove(this);
+            GameModel.getInstance().remove(this);
         }
 
         switch (dir1) {
@@ -175,6 +165,15 @@ public class tank extends GameObject{
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+    @Override
+    public int getwidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getheight() {
+        return HEIGHT;
     }
 
 }

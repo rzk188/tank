@@ -4,17 +4,14 @@ import java.awt.*;
 
 
 public class Explode extends GameObject{
-
-    private int x,y;
     public static int WIDTH= ResourceMgr.explodes[0].getWidth();
     public static int HEIGHT= ResourceMgr.explodes[0].getHeight();
     private boolean living =true;
     private int step=0;
-    GameModel gm =null;
-    public Explode(int x, int y, GameModel gm) {
+    public Explode(int x, int y) {
         this.x = x;
         this.y = y;
-        this.gm = gm;
+        GameModel.getInstance().add(this);
     }
     public void paint(Graphics g){
         /*Color c = g.getColor();
@@ -23,7 +20,16 @@ public class Explode extends GameObject{
         g.setColor(c);*/
         g.drawImage(ResourceMgr.explodes[step++],x,y,null);
         if(step>=ResourceMgr.explodes.length) {
-            gm.remove(this);
+            GameModel.getInstance().remove(this);
         }
+    }
+    @Override
+    public int getwidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getheight() {
+        return HEIGHT;
     }
 }

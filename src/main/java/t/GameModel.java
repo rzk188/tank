@@ -8,18 +8,34 @@ import java.util.List;
 import java.util.Objects;
 
 public class GameModel {
-    tank mytank=new tank(200,400,dir.UP,this,Group.GOOD);
+    private static final GameModel INSTANCE = new GameModel();
+
+    static {
+        INSTANCE.init();
+    }
+    tank mytank;
+    private GameModel() {
+
+    }
     //List<bullet> bullets=new ArrayList<bullet>();
     //List<tank> tanks=new ArrayList<>();
     //Explode e=new Explode(100,100,this);
     //List<Explode> e=new ArrayList<>();
     List<GameObject> objects=new ArrayList<>();
     ColliderChain chain=new ColliderChain();
-    public GameModel() {
+    public static GameModel getInstance(){
+        return INSTANCE;
+    }
+    public void init() {
+        mytank=new tank(200,400,dir.UP,Group.GOOD);
         int initTankCount=Integer.parseInt((String) Objects.requireNonNull(PropertyMgr.get("initTankCount")));
         for(int i=0;i<initTankCount;i++){
-            add(new tank(50+i*80,200,dir.DOWN,this,Group.BAD));
+            new tank(50+i*80,200,dir.DOWN,Group.BAD);
         }
+        add(new Wall(150,150,200,50));
+        add(new Wall(550,150,200,50));
+        add(new Wall(300,300,50,200));
+        add(new Wall(550,300,50,200));
     }
     public void add(GameObject go){
         this.objects.add(go);

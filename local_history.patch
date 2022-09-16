@@ -1,0 +1,334 @@
+Index: src/t/tank.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/t/tank.java b/src/main/java/t/tank.java
+rename from src/t/tank.java
+rename to src/main/java/t/tank.java
+--- a/src/t/tank.java	
++++ b/src/main/java/t/tank.java	(date 1663076910945)
+@@ -1,10 +1,13 @@
+ package t;
+ 
++import t.abstractfactory.BaseTank;
++
+ import java.awt.*;
++import java.lang.reflect.InvocationTargetException;
+ import java.util.Random;
+ 
+ 
+-public class tank {
++public class tank extends BaseTank{
+     public Rectangle rect=new Rectangle();
+     int x, y;
+     private Random random=new Random();
+@@ -49,24 +52,16 @@
+         if (group == Group.GOOD) {
+             String goodFSName=(String)PropertyMgr.get("goodFs");
+             try {
+-                fs=(FireStrategy) Class.forName(goodFSName).newInstance();
+-            } catch (ClassNotFoundException e) {
+-                throw new RuntimeException(e);
+-            } catch (InstantiationException e) {
+-                throw new RuntimeException(e);
+-            } catch (IllegalAccessException e) {
+-                throw new RuntimeException(e);
++                fs=(FireStrategy) Class.forName(goodFSName).getDeclaredConstructor().newInstance();
++            } catch (Exception e) {
++                e.printStackTrace();
+             }
+         } else {
+-            String badFSName=(String)PropertyMgr.get(("badFs"));
++            String badFSName = (String) PropertyMgr.get(("badFs"));
+             try {
+-                fs=(FireStrategy) Class.forName(badFSName).newInstance();
+-            } catch (InstantiationException e) {
+-                throw new RuntimeException(e);
+-            } catch (IllegalAccessException e) {
+-                throw new RuntimeException(e);
+-            } catch (ClassNotFoundException e) {
+-                throw new RuntimeException(e);
++                fs = (FireStrategy) Class.forName(badFSName).getDeclaredConstructor().newInstance();
++            } catch (Exception e) {
++                e.printStackTrace();
+             }
+         }
+     }
+Index: src/t/frame.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/t/frame.java b/src/main/java/t/frame.java
+rename from src/t/frame.java
+rename to src/main/java/t/frame.java
+--- a/src/t/frame.java	
++++ b/src/main/java/t/frame.java	(date 1663076910939)
+@@ -9,7 +9,7 @@
+         int initTankCount=Integer.parseInt((String)PropertyMgr.get("initTankCount"));
+         tankframe t=new tankframe();
+         for(int i=0;i<initTankCount;i++){
+-            t.tanks.add(new tank(50+i*80,200,dir.DOWN,t,Group.BAD));
++            t.tanks.add(t.gf.createTank(50+i*80,200,dir.DOWN,t,Group.BAD));
+         }
+         while (true){
+             Thread.sleep(50);
+Index: src/t/bullet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/t/bullet.java b/src/main/java/t/bullet.java
+rename from src/t/bullet.java
+rename to src/main/java/t/bullet.java
+--- a/src/t/bullet.java	
++++ b/src/main/java/t/bullet.java	(date 1663076910931)
+@@ -1,9 +1,12 @@
+ package t;
+ 
++import t.abstractfactory.BaseBullet;
++import t.abstractfactory.BaseTank;
++
+ import java.awt.*;
+ 
+ 
+-public class bullet {
++public class bullet extends BaseBullet{
+     private static final int SPEED=10;
+     private int x,y;
+     private dir dir1;
+@@ -59,16 +62,16 @@
+         rect.y=this.y;
+     }
+ 
+-    public void collidewith(tank tank) {
+-        if(this.group==tank.getGroup()) return;
++    public void collidewith(BaseTank tank1) {
++        if(this.group==tank1.getGroup()) return;
+         //Rectangle rect1=new Rectangle(this.x,this.y,WIDTH,HEIGHT);
+         //Rectangle rect2=new Rectangle(tank.getX(),tank.getY(),tank.WIDTH,tank.HEIGHT);
+-        if (rect.intersects(tank.rect)){
+-            tank.die();
++        if (rect.intersects(tank1.rect)){
++            tank1.die();
+             this.die();
+-            int ex=tank.getX()+tank.WIDTH/2-Explode.WIDTH/2;
+-            int ey=tank.getY()+tank.HEIGHT/2-Explode.HEIGHT/2;
+-            tf.e.add(new Explode(ex,ey,this.tf));
++            int ex=tank1.getX()+tank.WIDTH/2-Explode.WIDTH/2;
++            int ey=tank1.getY()+tank.HEIGHT/2-Explode.HEIGHT/2;
++            tf.e.add(tf.gf.createExplode(ex,ey,this.tf));
+         }
+ 
+     }
+Index: src/t/Explode.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/t/Explode.java b/src/main/java/t/Explode.java
+rename from src/t/Explode.java
+rename to src/main/java/t/Explode.java
+--- a/src/t/Explode.java	
++++ b/src/main/java/t/Explode.java	(date 1663076910923)
+@@ -1,9 +1,11 @@
+ package t;
+ 
++import t.abstractfactory.BaseExplode;
++
+ import java.awt.*;
+ 
+ 
+-public class Explode {
++public class Explode extends BaseExplode {
+ 
+     private int x,y;
+     public static int WIDTH= ResourceMgr.explodes[0].getWidth();
+@@ -16,6 +18,7 @@
+         this.y = y;
+         this.tf=tf;
+     }
++    @Override
+     public void paint(Graphics g){
+         g.drawImage(ResourceMgr.explodes[step++],x,y,null);
+         if(step>=ResourceMgr.explodes.length) {
+Index: src/t/tankframe.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/t/tankframe.java b/src/main/java/t/tankframe.java
+rename from src/t/tankframe.java
+rename to src/main/java/t/tankframe.java
+--- a/src/t/tankframe.java	
++++ b/src/main/java/t/tankframe.java	(date 1663076910901)
+@@ -1,4 +1,9 @@
+ package t;
++import t.abstractfactory.BaseExplode;
++import t.abstractfactory.BaseTank;
++import t.abstractfactory.DefaultFactory;
++import t.abstractfactory.*;
++
+ import java.awt.*;
+ import java.awt.event.KeyAdapter;
+ import java.awt.event.KeyEvent;
+@@ -11,10 +16,11 @@
+     static final int GAME_WIDTH=800;
+     static final int GAME_HEIGHT=600;
+     tank mytank=new tank(200,400,dir.UP,this,Group.GOOD);
+-    List<bullet> bullets=new ArrayList<bullet>();
+-    List<tank> tanks=new ArrayList<>();
++    List<BaseBullet> bullets=new ArrayList<>();
++    List<BaseTank> tanks=new ArrayList<>();
+     //Explode e=new Explode(100,100,this);
+-    List<Explode> e=new ArrayList<>();
++    List<BaseExplode> e=new ArrayList<>();
++    GameFactory gf=new DefaultFactory();
+     public tankframe(){
+         setSize(GAME_WIDTH,GAME_HEIGHT);
+         setResizable(false);
+Index: src/main/java/t/abstractfactory/BaseTank.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/t/abstractfactory/BaseTank.java b/src/main/java/t/abstractfactory/BaseTank.java
+new file mode 100644
+--- /dev/null	(date 1663076910896)
++++ b/src/main/java/t/abstractfactory/BaseTank.java	(date 1663076910896)
+@@ -0,0 +1,24 @@
++package t.abstractfactory;
++
++import t.*;
++
++import java.awt.*;
++
++public abstract class BaseTank {
++
++    public Rectangle rect = new Rectangle();
++
++    public Group group = Group.BAD;
++
++    public abstract void paint(Graphics g);
++
++    public Group getGroup() {
++        return group;
++    }
++
++    public abstract void die();
++
++    public abstract int getX();
++
++    public abstract int getY();
++}
+Index: src/main/java/t/abstractfactory/BaseBullet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/t/abstractfactory/BaseBullet.java b/src/main/java/t/abstractfactory/BaseBullet.java
+new file mode 100644
+--- /dev/null	(date 1663076910885)
++++ b/src/main/java/t/abstractfactory/BaseBullet.java	(date 1663076910885)
+@@ -0,0 +1,9 @@
++package t.abstractfactory;
++
++import java.awt.*;
++
++public abstract class BaseBullet {
++    public abstract void paint(Graphics g);
++
++    public abstract void collidewith(BaseTank tank);
++}
+Index: src/main/java/t/abstractfactory/BaseExplode.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/t/abstractfactory/BaseExplode.java b/src/main/java/t/abstractfactory/BaseExplode.java
+new file mode 100644
+--- /dev/null	(date 1663076910874)
++++ b/src/main/java/t/abstractfactory/BaseExplode.java	(date 1663076910874)
+@@ -0,0 +1,7 @@
++package t.abstractfactory;
++
++import java.awt.*;
++
++public abstract class BaseExplode {
++    public abstract void paint(Graphics g);
++}
+Index: src/main/java/t/abstractfactory/GameFactory.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/t/abstractfactory/GameFactory.java b/src/main/java/t/abstractfactory/GameFactory.java
+new file mode 100644
+--- /dev/null	(date 1663076910863)
++++ b/src/main/java/t/abstractfactory/GameFactory.java	(date 1663076910863)
+@@ -0,0 +1,12 @@
++package t.abstractfactory;
++
++import t.Group;
++import t.*;
++
++public abstract class GameFactory {
++    public abstract BaseTank createTank(int x, int y, dir dir, tankframe tf ,Group group);
++
++    public abstract BaseBullet createBullet(int x, int y, dir dir, tankframe tf ,Group group);
++
++    public abstract BaseExplode createExplode(int x,int y,tankframe tf);
++}
+Index: src/main/java/t/abstractfactory/DefaultFactory.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/t/abstractfactory/DefaultFactory.java b/src/main/java/t/abstractfactory/DefaultFactory.java
+new file mode 100644
+--- /dev/null	(date 1663076910853)
++++ b/src/main/java/t/abstractfactory/DefaultFactory.java	(date 1663076910853)
+@@ -0,0 +1,18 @@
++package t.abstractfactory;
++import t.*;
++
++public class DefaultFactory extends GameFactory{
++    @Override
++    public BaseTank createTank(int x, int y, dir dir1,tankframe tf,Group group){
++        return new tank(x,y,dir1,tf,group);
++    }
++    @Override
++    public BaseExplode createExplode(int x, int y,tankframe tf){
++        return new Explode(x,y,tf);
++    }
++    @Override
++    public BaseBullet createBullet(int x, int y, dir dir1,tankframe tf,Group group){
++        return new bullet(x,y,dir1,tf,group);
++    }
++
++}
+diff --git a/src/t/dir.java b/src/main/java/t/dir.java
+rename from src/t/dir.java
+rename to src/main/java/t/dir.java
+diff --git a/src/t/Group.java b/src/main/java/t/Group.java
+rename from src/t/Group.java
+rename to src/main/java/t/Group.java
+diff --git a/src/t/ImageUtil.java b/src/main/java/t/ImageUtil.java
+rename from src/t/ImageUtil.java
+rename to src/main/java/t/ImageUtil.java
+diff --git a/src/t/PropertyMgr.java b/src/main/java/t/PropertyMgr.java
+rename from src/t/PropertyMgr.java
+rename to src/main/java/t/PropertyMgr.java
+diff --git a/src/t/ResourceMgr.java b/src/main/java/t/ResourceMgr.java
+rename from src/t/ResourceMgr.java
+rename to src/main/java/t/ResourceMgr.java
+diff --git a/src/t/FireStrategy.java b/src/main/java/t/FireStrategy.java
+rename from src/t/FireStrategy.java
+rename to src/main/java/t/FireStrategy.java
+diff --git a/src/t/DefaultFireStrategy.java b/src/main/java/t/DefaultFireStrategy.java
+rename from src/t/DefaultFireStrategy.java
+rename to src/main/java/t/DefaultFireStrategy.java
+diff --git a/src/t/FourDirFireStrategy.java b/src/main/java/t/FourDirFireStrategy.java
+rename from src/t/FourDirFireStrategy.java
+rename to src/main/java/t/FourDirFireStrategy.java

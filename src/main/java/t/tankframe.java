@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class tankframe extends Frame {
-    public GameModel gm=new GameModel();
+    public GameModel gm=GameModel.getInstance();
     static final int GAME_WIDTH=1000;
     static final int GAME_HEIGHT=600;
 
@@ -41,7 +41,7 @@ public class tankframe extends Frame {
     }
     @Override
     public void paint(Graphics g) {
-        gm.paint(g);
+        GameModel.getInstance().paint(g);
 
     }
     class Mykeylistener extends KeyAdapter{

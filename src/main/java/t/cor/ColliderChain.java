@@ -10,6 +10,8 @@ public class ColliderChain implements collider{
     public ColliderChain() {
         add(new TankTankCollider());
         add(new BulletTankCollider());
+        add(new BulletWallCollider());
+        add(new TankWallCollider());
     }
     public void add(collider c){
         colliders.add(c);
